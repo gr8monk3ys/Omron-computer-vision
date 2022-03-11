@@ -3,10 +3,10 @@ import numpy as np
 
 class History:
     def __init__(self):
-        self.history = pd.DataFrame(columns=['partid','image','classification','metadata'])
-    
-    def addPart(self,partid:int,img:np.array)->None:
-        d_row = pd.DataFrame({'partid':partid,'image':[img],'classification':pd.NA,'metadata':pd.NA},columns=['partid','image','classification','metadata'])
+        self.history = pd.DataFrame(columns=['partid','image','orientation','classification','metadata'])
+
+    def addPart(self,partid:int,orientation:int,img:np.array)->None:
+        d_row = pd.DataFrame({'partid':partid,'image':[img],'orientation':orientation,'classification':pd.NA,'metadata':pd.NA},columns=['partid','image','orientation','classification','metadata'])
         self.history = pd.concat(objs=[self.history,d_row],ignore_index=True)
     
     def removePart(self,partid)->None:
@@ -18,3 +18,6 @@ class History:
     
     def loadHistory(self,path:str)->None:
         self.history = pd.read_pickle(path)
+        
+    def saveCSV(self,path:str)->None:
+        self.history[['partid','orientation','classification']].to_csv(path,index=False)
