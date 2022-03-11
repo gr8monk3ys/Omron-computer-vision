@@ -16,3 +16,5 @@ class History:
     def saveHistory(self,path:str)->None:
         self.history.to_pickle(path)
     
+    def loadHistory(self,path:str)->None:
+        self.history = pd.read_pickle(path)
