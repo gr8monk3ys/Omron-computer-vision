@@ -35,7 +35,9 @@ class History:
         self.history.loc[(self.history.partid==partid) & \
                          (self.history.orientation==orientation),
                          'metadata'] = metadata
-        
+    def getImage(self,partid:int,orientation:int)->np.array:
+        return self.history[(self.history.partid==partid) & (self.history.orientation==orientation)]['image'].iloc[0]
+    
     def saveHistory(self,path:str)->None:
         self.history.to_pickle(path)
     
