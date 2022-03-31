@@ -19,10 +19,11 @@ class Pipeline:
         except:
             raise NoModelFound
         # qual functions
+        self._reshp = lambda image : cv.resize(image,(250,250))
         self._flatten = lambda batch : batch.reshape(batch.shape[0],-1)
-    
+        
     def classify(self,imgs):
-        # classify single image using pipeline
-        return self._pipe.predict(self._flatten(imgs))
+        # classify batch of images using pipeline(Reshape,Scalar,PCA,SVM)
+        return self._pipe.predict(self._flatten(np.array(list(map(self._reshp,imgs)))))
     
     
