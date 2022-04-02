@@ -2,7 +2,7 @@ import tkinter as tk
 import tkinter.font as font
 from tkinter import *
 from PIL import Image, ImageTk
-from apiTest import Interface
+from API import Interface
 
 class Display:
     def __init__(self):
@@ -30,7 +30,7 @@ class Display:
         lbl = tk.Label(window, text="Current Image: ", width=15, height=5, font=myFont)
         lbl.grid(column=4, row=1)
 
-        btn1 = tk.Button(window, text="Take Picture", width=11, height=2, font=myFont, command=self.picture_taken)
+        btn1 = tk.Button(window, text="Take Picture", width=11, height=2, font=myFont, command=self.takePicture)
         btn1.grid(column=1, row=1)
 
         btn2 = tk.Button(window, text="Classify Picture", width=13, height=2, font=myFont, command=self.categorize)
@@ -43,7 +43,7 @@ class Display:
         self.quality_lbl.grid(column=4, row=5)
 
         # black screen image import
-        image = Image.open("golden_frieza.jpg")
+        image = Image.open("greyscreen.jpeg")
         resizephoto = image.resize((150, 150))
         photo = ImageTk.PhotoImage(resizephoto)
 
@@ -55,16 +55,16 @@ class Display:
 
         window.mainloop()
 
-    def picture_taken(self):
-        self.label1.image = self.api.load_pic()
+    def takePicture(self):
+        self.label1.image = self.api.takePicture()
         #self.new_text.configure(text="Picture taken")
 
     def categorize(self):
-        self.quality_lbl = self.api.classify_pic()
+        self.quality_lbl = self.api.classify_img()
         #self.new_text2.configure(text="good/bad")
 
     def export(self):
-        self.api.get_data()
+        self.api.saveCSV()
         #self.new_text3.configure(text="exporting")
 
 
