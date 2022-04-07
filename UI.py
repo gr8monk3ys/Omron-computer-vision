@@ -1,73 +1,102 @@
+
 import tkinter as tk
 import tkinter.font as font
 from tkinter import *
-from PIL import Image, ImageTk
+from PIL import Image
+from PIL import ImageTk
 from API import Interface
+import cv2 as cv
 
 class Display:
+    # -------------------window---------------------------------
     def __init__(self):
         self.api = Interface()
         window = tk.Tk()
         window.title("Omron UI")
-
         myFont = font.Font(family='Helvetica')
+        window.geometry("512x512") #size of window
 
-        window.geometry("512x512")
-
+        #----------------------Button layout------------------------------
         for i in range(13):
-            window.grid_columnconfigure(i, weight=2)
+            window.grid_columnconfigure(i, weight=1) #2 ?
             window.grid_rowconfigure(i, weight=1)
 
-        self.new_text = tk.Label(window, width=15, height=5, font=myFont)
-        self.new_text.grid(column=6, row=1)
+        self.currentImageLbl = tk.Label(window, width=15, height=5, font=myFont)
+        self.currentImageLbl.grid(column=6, row=1)
+        #
+        # self.takePictureLbl = tk.Label(window, width=15, height=5, font=myFont)
+        # self.takePictureLbl.grid(column=6, row=5)
+        #
+        self.classifyPictureLbl = tk.Label(window, width=15, height=5, font=myFont)
+        self.classifyPictureLbl.grid(column=6, row=6)
 
-        self.new_text2 = tk.Label(window, width=15, height=5, font=myFont)
-        self.new_text2.grid(column=6, row=5)
+        takePictureBtn = tk.Button(window, text="Take Picture", width=11, height=2, font=myFont, command=self.takePicture)
+        takePictureBtn.grid(column=0, row=3)
 
-        self.new_text3 = tk.Label(window, width=15, height=5, font=myFont)
-        self.new_text3.grid(column=6, row=6)
+        classifyPictureBtn = tk.Button(window, text="Classify Picture", width=13, height=2, font=myFont,command=self.categorize)
+        classifyPictureBtn.grid(column=0, row=4)
 
-        lbl = tk.Label(window, text="Current Image: ", width=15, height=5, font=myFont)
-        lbl.grid(column=4, row=1)
-
-        btn1 = tk.Button(window, text="Take Picture", width=11, height=2, font=myFont, command=self.takePicture)
-        btn1.grid(column=1, row=1)
-
-        btn2 = tk.Button(window, text="Classify Picture", width=13, height=2, font=myFont, command=self.categorize)
-        btn2.grid(column=1, row=3)
-
-        btn3 = tk.Button(window, text="Export CSV", width=11, height=2, font=myFont, command=self.export)
-        btn3.grid(column=1, row=5)
+        exportCsvBtn = tk.Button(window, text="Export CSV", width=11, height=2, font=myFont, command=self.export)
+        exportCsvBtn.grid(column=0, row=5)
 
         self.quality_lbl = tk.Label(window, text="Quality:", width=15, height=5, font=myFont)
-        self.quality_lbl.grid(column=4, row=5)
+        self.quality_lbl.grid(column=0, row=6)
+
+        # ----------------------Black screen------------------------------
+        #current image text shoudl be next to black screen
+        self.currentImageLbl = tk.Label(window, text="Current Image: ", width=16, height=5, font=myFont)
+        self.currentImageLbl.grid(column=3, row=2)
 
         # black screen image import
         image = Image.open("greyscreen.jpeg")
         resizephoto = image.resize((150, 150))
         photo = ImageTk.PhotoImage(resizephoto)
 
-        self.label1 = tk.Label(window, image=photo)
-        self.label1.image = photo
-        # Position image
-        # label1.place(x=320, y=100)
-        self.label1.grid(column=10, row=2)
+        #main black screen
+        self.blackScreen = tk.Label(window, image=photo)
+        self.blackScreen.image = photo
+        self.blackScreen.grid(column=3, row=3)
+
+        #---------------------PartID----------------------------
+        #partID text
+        self.partID_text = Label(window, text="PartID: ")
+        self.partID_text.grid(column=0, row=1)
+
+        #labeled partid input box
+        self.partID_box = tk.StringVar() #String
+        # name = name_var.get()
+        self.partID_box.set("")
+        self.partID_entry = tk.Entry(window, textvariable=self.partID_text, font=('calibre', 10, 'normal'))
+        self.partID_entry.grid(column=1, row=1)
+
+        # ---------------------Orientation ----------------------------
+        # orientation text
+        self.orientation_text = Label(window, text="Orientation: ")
+        self.orientation_text.grid(column=0, row=2)
+        # labeled orientation
+        self.orientation_box = tk.IntVar() #integer
+        # name = name_var.get()
+        self.orientation_box.set("")
+        self.orientation_entry = tk.Entry(window, textvariable=self.orientation_text, font=('calibre', 10, 'normal'))
+        self.orientation_entry.grid(column=1, row=2)
 
         window.mainloop()
 
     def takePicture(self):
-        self.label1.image = self.api.takePicture()
-        #self.new_text.configure(text="Picture taken")
-
+        [partid,ori] = self.getPartInfo()
+        im = self.api.takePicture(partid,ori)
+        im = cv.resize(im,(150,150))
+        self.blackScreen.configure(image=ImageTk.PhotoImage(Image.fromarray(im)))
+        
     def categorize(self):
-        self.quality_lbl = self.api.classify_img()
-        #self.new_text2.configure(text="good/bad")
+        [partid,ori] = self.getPartInfo()
+        res = self.api.classify_img(partid,ori)
+        mp = ['bad', 'good']
+        self.classifyPictureLbl.configure(text=mp[res])
 
     def export(self):
         self.api.saveCSV()
-        #self.new_text3.configure(text="exporting")
+        #self.new_text3.configure(text="exported")
 
-
-a = Display()
-
-
+    def getPartInfo(self):
+        return [self.partID_entry.get(), self.orientation_entry.get()]
