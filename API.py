@@ -4,18 +4,21 @@ from picamera import PiCamera
 from PIL import Image
 import numpy as np
 import cv2 as cv
+from io import BytesIo
 
 class Interface:
     def __init__(self):
         self.hist = History()
         self.clf = Pipeline()
-        cam = PiCamera()
+        self.cam = PiCamera()
         
     def takePicture(self,partid:str,orientation:str):
         stream = BytesIO()
-        cam.capture(stream,'png')
+        self.cam.capture(stream,'png')
         stream.seek(0)
         im = Image.open(stream)
+        im = np.asarray(im)
+        im = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
         self.hist.addPart(partid,orientation,im)
         return im
         

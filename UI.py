@@ -87,6 +87,7 @@ class Display:
         im = self.api.takePicture(partid,ori)
         im = cv.resize(im,(150,150))
         self.blackScreen.configure(image=ImageTk.PhotoImage(Image.fromarray(im)))
+        self.classifyPictureLbl.configure(text="")
         
     def categorize(self):
         [partid,ori] = self.getPartInfo()
