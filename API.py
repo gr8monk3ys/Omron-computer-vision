@@ -1,10 +1,11 @@
 from History import History
 from Pipeline import Pipeline
-from picamera import PiCamera
+#from picamera import PiCamera
 from PIL import Image
 import numpy as np
 import cv2 as cv
-from io import BytesIo
+from io import BytesIO
+import matplotlib.pyplot as plt 
 
 class Interface:
     def __init__(self):

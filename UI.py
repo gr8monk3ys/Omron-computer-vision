@@ -49,14 +49,13 @@ class Display:
 
         # black screen image import
         image = Image.open("greyscreen.jpeg")
-        resizephoto = image.resize((150, 150))
+        resizephoto = image.resize((200, 200))
         photo = ImageTk.PhotoImage(resizephoto)
 
-        #main black screen
-        self.blackScreen = tk.Label(window, image=photo)
-        self.blackScreen.image = photo
-        self.blackScreen.grid(column=3, row=3)
-
+        #image display
+        self.canvas = Canvas(window, width = 200, height = 200)   
+        self.canvas.grid(row=3,column=3)
+        self.canvas.create_image(100,100,image=photo)
         #---------------------PartID----------------------------
         #partID text
         self.partID_text = Label(window, text="PartID: ")
@@ -85,8 +84,10 @@ class Display:
     def takePicture(self):
         [partid,ori] = self.getPartInfo()
         im = self.api.takePicture(partid,ori)
-        im = cv.resize(im,(150,150))
-        self.blackScreen.configure(image=ImageTk.PhotoImage(Image.fromarray(im)))
+        im = cv.resize(im,(200,200))
+        photo = ImageTk.PhotoImage(Image.fromarray(im))
+        self.canvas.create_image(100,100,image=photo)   
+        self.canvas.itemconfigure(self.canvas, image=photo)
         self.classifyPictureLbl.configure(text="")
         
     def categorize(self):
@@ -101,3 +102,5 @@ class Display:
 
     def getPartInfo(self):
         return [self.partID_entry.get(), self.orientation_entry.get()]
+    
+Display()
