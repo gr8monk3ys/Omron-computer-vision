@@ -1,6 +1,6 @@
 from History import History
 from Pipeline import Pipeline
-#from picamera import PiCamera
+from picamera import PiCamera
 from PIL import Image
 import numpy as np
 import cv2 as cv
