@@ -5,13 +5,13 @@ from PIL import Image
 import numpy as np
 import cv2 as cv
 from io import BytesIO
-import matplotlib.pyplot as plt 
 
 class Interface:
     def __init__(self):
         self.hist = History()
         self.clf = Pipeline()
         self.cam = PiCamera()
+        self.cam.shutter_speed = 1
         
     def takePicture(self,partid:str,orientation:str):
         stream = BytesIO()
