@@ -1,25 +1,17 @@
 from History import History
 from Pipeline import Pipeline
-from picamera import PiCamera
-from PIL import Image
+from Camera import Camera # or rpiCamera for picamera
+
 import numpy as np
-import cv2 as cv
-from io import BytesIO
 
 class Interface:
     def __init__(self):
         self.hist = History()
         self.clf = Pipeline()
-        self.cam = PiCamera()
-        self.cam.shutter_speed = 1
+        self.cam = Camera()
         
     def takePicture(self,partid:str,orientation:str):
-        stream = BytesIO()
-        self.cam.capture(stream,'png')
-        stream.seek(0)
-        im = Image.open(stream)
-        im = np.asarray(im)
-        im = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
+        im = self.cam.takePicture()
         self.hist.addPart(partid,orientation,im)
         return im
         
