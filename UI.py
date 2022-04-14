@@ -37,10 +37,8 @@ class Display:
         self.quality_text = Label(window, bg = '#f9efd2', fg = 'black', text="Quality:") #return quality:bad/good
         self.quality_text.grid(column=2, row=5, sticky="nsew")
 
-        self.quality_box = tk.StringVar()  # integer
-        self.quality_box.set("")
-        self.quality_entry = tk.Entry(window, textvariable=self.quality_text, font=('calibre', 10, 'normal'), highlightbackground = "black")
-        self.quality_entry.grid(column=2, row=6, sticky="nsew")
+        self.quality_box = Label(window, text="")
+        self.quality_box.grid(column=2, row=6, sticky="nsew")
 
         self.currentImage_text = Label(window, text="Current Image:(_/_)") #add image number
         self.currentImage_text.grid(column=2, row=3, sticky="nsew")
@@ -56,9 +54,9 @@ class Display:
         photo1 = ImageTk.PhotoImage(resizephoto1)
 
         #image display
-        self.canvas = Canvas(window, width = 200, height = 200)
-        self.canvas.grid(column=2, row=4, sticky="nesw")
-        self.canvas.create_image(100,100,image=photo1)
+        self.canvas2 = Canvas(window, width = 200, height = 200)
+        self.canvas2.grid(column=2, row=4, sticky="nesw")
+        self.canvas_image2 = self.canvas2.create_image(100,100,image=photo1)
 
         #------------------------black screen-------------------
         self.SegmentationLbl = tk.Label(window, text="Segmentation fault: ", width=20, height=2, font=myFont)
@@ -71,8 +69,8 @@ class Display:
         # image display
         self.canvas = Canvas(window, width=150, height=200)
         self.canvas.grid(column=0, row=4,sticky="nsew")
-        self.canvas.create_image(100, 100, image=photo)
-
+        self.canvas_image = self.canvas.create_image(100, 100, image=photo)
+        
 
         #---------------------PartID----------------------------
         #partID text
@@ -90,7 +88,7 @@ class Display:
         self.orientation_text = Label(window, text="Orientation: ")
         self.orientation_text.grid(column=0, row=2, sticky="nsew")
         # labeled orientation
-        self.orientation_box = tk.IntVar() #integer
+        self.orientation_box = tk.StringVar() #integer
         self.orientation_box.set("")
         self.orientation_entry = tk.Entry(window, textvariable=self.orientation_text, font=('calibre', 10, 'normal'), highlightbackground = "black")
         self.orientation_entry.grid(column=1, row=2, sticky="nsew")
@@ -101,21 +99,21 @@ class Display:
         [partid,ori] = self.getPartInfo()
         im = self.api.takePicture(partid,ori)
         im = cv.resize(im,(200,200))
-        photo = ImageTk.PhotoImage(Image.fromarray(im))
-        self.canvas.create_image(100,100,image=photo)
-        self.canvas.itemconfigure(self.canvas, image=photo)
-        self.classifyPictureLbl.configure(text="")
+        self.photo = ImageTk.PhotoImage(Image.fromarray(im))
+        self.canvas.create_image(100,100,image=self.photo)
+        self.canvas.itemconfigure(self.canvas_image, image=self.photo)
+        self.quality_box.configure(text="")
         
     def categorize(self):
         [partid,ori] = self.getPartInfo()
         res = self.api.classify_img(partid,ori)
         mp = ['bad', 'good']
-        self.classifyPictureLbl.configure(text=mp[res])
+        self.quality_box.configure(text=mp[res])
 
     def export(self):
         self.api.saveCSV()
 
     def getPartInfo(self):
-        return [self.partID_entry.get(), self.orientation_entry.get()]
+        return [self.partID_box.get(), self.orientation_box.get()]
     
 Display()
