@@ -1,6 +1,6 @@
 from History import History
 from Pipeline import Pipeline
-from Camera import Camera # or rpiCamera for picamera
+from rpiCamera import Camera # or rpiCamera for picamera
 
 import numpy as np
 

@@ -55,7 +55,7 @@ class Display:
         #image display
         self.canvas = Canvas(window, width = 200, height = 200)   
         self.canvas.grid(row=3,column=3)
-        self.canvas.create_image(100,100,image=photo)
+        self.canvas_img = self.canvas.create_image(100,100,image=photo)
         #---------------------PartID----------------------------
         #partID text
         self.partID_text = Label(window, text="PartID: ")
@@ -85,9 +85,8 @@ class Display:
         [partid,ori] = self.getPartInfo()
         im = self.api.takePicture(partid,ori)
         im = cv.resize(im,(200,200))
-        photo = ImageTk.PhotoImage(Image.fromarray(im))
-        self.canvas.create_image(100,100,image=photo)   
-        self.canvas.itemconfigure(self.canvas, image=photo)
+        self.photo = ImageTk.PhotoImage(Image.fromarray(im))
+        self.canvas.itemconfigure(self.canvas_img, image=self.photo)
         self.classifyPictureLbl.configure(text="")
         
     def categorize(self):
