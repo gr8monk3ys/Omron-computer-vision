@@ -5,9 +5,11 @@ import io
 
 class Camera:
     def __init__(self):
-        self.cam = cv.VideoCapture(0)
+        pass
     def takePicture(self):
+        self.cam = cv.VideoCapture(0)
         _, im = self.cam.read()
+        self.cam.release()
         im = np.asarray(im)
         im = cv.cvtColor(im, cv.COLOR_BGR2GRAY)
         return im
