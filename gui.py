@@ -33,7 +33,7 @@ class Display:
         window.configure(bg="#3A7FF6")
 
 
-        canvas = Canvas(
+        self.canvas = Canvas(
             window,
             bg = "#3A7FF6",
             height = 519,
@@ -43,8 +43,8 @@ class Display:
             relief = "ridge"
         )
 
-        canvas.place(x = 0, y = 0)
-        canvas.create_rectangle(
+        self.canvas.place(x = 0, y = 0)
+        self.canvas.create_rectangle(
             431.0,
             0.0,
             862.0,
@@ -60,7 +60,7 @@ class Display:
             image=ClassifyButton_image_1,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_1 clicked"),
+            command=lambda: self.categorize(),
             relief="flat"
         )
 
@@ -78,7 +78,7 @@ class Display:
             image=TakePictureButton_image_2,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_2 clicked"),
+            command=lambda: self.takePicture(),
             relief="flat"
         )
 
@@ -95,7 +95,7 @@ class Display:
             image=ExportCSVButton_image_3,
             borderwidth=0,
             highlightthickness=0,
-            command=lambda: print("button_3 clicked"),
+            command=lambda: self.export(),
             relief="flat"
         )
         ExportCSV_button.place(
@@ -105,7 +105,7 @@ class Display:
             height=55.0
         )
         #------Automation of Visual Inspection-------- maybe team name?
-        canvas.create_text(
+        self.canvas.create_text(
             13.0,
             13.0,
             anchor="nw",
@@ -114,7 +114,7 @@ class Display:
             font=("Roboto Bold", 24 * -1)
         )
         #-------Current Image --------
-        canvas.create_text(
+        self.canvas.create_text(
             39.0,
             186.0,
             anchor="nw",
@@ -126,14 +126,14 @@ class Display:
         CurrentImage_screen = PhotoImage(
             file=relative_to_assets("image_2.png"))
 
-        CurrentImage_screenCanvas = canvas.create_image(
+        self.CurrentImage_screenCanvas = self.canvas.create_image(
             186.0,
             357.0,
             image=CurrentImage_screen
         )
 
         #-------Image Segmentation-------
-        canvas.create_text(
+        self.canvas.create_text(
             503.0,
             35.0,
             anchor="nw",
@@ -144,13 +144,13 @@ class Display:
         ImageSegmenation_screen = PhotoImage(
             file=relative_to_assets("blackscreen.png"))
 
-        ImageSegmenation_screenCanvas = canvas.create_image(
+        self.ImageSegmenation_screenCanvas = self.canvas.create_image(
             655.0,
             198.0,
             image=ImageSegmenation_screen
         )
         #-------Quality-------
-        canvas.create_text(
+        self.quality_text = self.canvas.create_text(
             503.0,
             336.0,
             anchor="nw",
@@ -159,7 +159,7 @@ class Display:
             font=("Roboto Bold", 24 * -1)
         )
         #-------Orientation-----------
-        canvas.create_text(
+        self.canvas.create_text(
             13.0,
             130.0,
             anchor="nw",
@@ -171,19 +171,19 @@ class Display:
         entry_image_2 = PhotoImage(
             file=relative_to_assets("entry_2.png"))
 
-        entry_bg_2 = canvas.create_image(
+        self.entry_bg_2 = self.canvas.create_image(
             256.0,
             144.0,
             image=entry_image_2
         )
 
-        orientation_entry = Entry(
+        self.orientation_entry = Entry(
             bd=0,
             bg="#F1F5FF",
             highlightthickness=0
         )
 
-        orientation_entry.place(
+        self.orientation_entry.place(
             x=172.0,
             y=127.0,
             width=168.0,
@@ -191,7 +191,7 @@ class Display:
         )
 
         # -------Part ID-------
-        canvas.create_text(
+        self.canvas.create_text(
             13.0,
             88.0,
             anchor="nw",
@@ -203,19 +203,19 @@ class Display:
         entry_image_1 = PhotoImage(
             file=relative_to_assets("entry_1.png"))
 
-        entry_bg_1 = canvas.create_image(
+        self.entry_bg_1 = self.canvas.create_image(
             256.0,
             102.0,
             image=entry_image_1
         )
 
-        partID_entry = Entry(
+        self.partID_entry = Entry(
             bd=0,
             bg="#F1F5FF",
             highlightthickness=0
         )
 
-        partID_entry.place(
+        self.partID_entry.place(
             x=172.0,
             y=85.0,
             width=168.0,
@@ -229,16 +229,19 @@ class Display:
         [partid, ori] = self.getPartInfo()
         im = self.api.takePicture(partid, ori)
         im = cv.resize(im, (200, 200))
-        photo = ImageTk.PhotoImage(Image.fromarray(im))
-        self.canvas.create_image(100, 100, image=photo)
-        self.canvas.itemconfigure(self.canvas, image=photo)
-        self.classifyPictureLbl.configure(text="")
+        self.photo = ImageTk.PhotoImage(Image.fromarray(im))
+        self.canvas.itemconfigure(self.CurrentImage_screenCanvas, image=self.photo)
+        #self.classifyPictureLbl.configure(text="")
+        self.canvas.itemconfigure(self.quality_text,text="Quality: ")
+
 
     def categorize(self):
         [partid, ori] = self.getPartInfo()
         res = self.api.classify_img(partid, ori)
         mp = ['bad', 'good']
-        self.classifyPictureLbl.configure(text=mp[res])
+        #self.quality_text.configure(text="Quality: " + mp[res])
+        self.canvas.itemconfigure(self.quality_text,text="Quality: " + mp[res])
+        # need to modify canvas like takePicture for info from segmented model
 
     def export(self):
         self.api.saveCSV()
