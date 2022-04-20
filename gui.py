@@ -4,10 +4,16 @@
 
 
 from pathlib import Path
-
-# from tkinter import *
-# Explicit imports to satisfy Flake8
 from tkinter import Tk, Canvas, Entry, Text, Button, PhotoImage
+
+import tkinter as tk
+import tkinter.font as font
+import matplotlib.pyplot as plt
+from tkinter import *
+import cv2 as cv
+from API import Interface
+from PIL import Image
+from PIL import ImageTk
 
 
 OUTPUT_PATH = Path(__file__).parent
@@ -17,202 +23,228 @@ ASSETS_PATH = OUTPUT_PATH / Path("./assets")
 def relative_to_assets(path: str) -> Path:
     return ASSETS_PATH / Path(path)
 
+class Display:
+    # -------------------window---------------------------------
+    def __init__(self):
+        self.api = Interface()
+        window = Tk()
+        window.title("Omron UI")
+        window.geometry("862x519")
+        window.configure(bg="#3A7FF6")
 
-window = Tk()
-window.title("Omron UI")
 
-window.geometry("862x519")
-window.configure(bg="#3A7FF6")
+        canvas = Canvas(
+            window,
+            bg = "#3A7FF6",
+            height = 519,
+            width = 862,
+            bd = 0,
+            highlightthickness = 0,
+            relief = "ridge"
+        )
+
+        canvas.place(x = 0, y = 0)
+        canvas.create_rectangle(
+            431.0,
+            0.0,
+            862.0,
+            519.0,
+            fill="#FCFCFC",
+            outline="")
+        #-------------------------------BUTTONS------------------------
+        #-------classify-------
+        ClassifyButton_image_1 = PhotoImage(
+            file=relative_to_assets("button_1.png"))
+
+        Classify_button= Button(
+            image=ClassifyButton_image_1,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_1 clicked"),
+            relief="flat"
+        )
+
+        Classify_button.place(
+            x=451.0,
+            y=458.0,
+            width=180.0,
+            height=55.0
+        )
+        #-------Take Picture-------
+        TakePictureButton_image_2 = PhotoImage(
+            file=relative_to_assets("button_2.png"))
+
+        TakePicture_button = Button(
+            image=TakePictureButton_image_2,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_2 clicked"),
+            relief="flat"
+        )
+
+        TakePicture_button.place(
+            x=451.0,
+            y=393.0,
+            width=180.0,
+            height=55.0
+        )
+        #-------Export CSV-------
+        ExportCSVButton_image_3 = PhotoImage(
+            file=relative_to_assets("button_3.png"))
+        ExportCSV_button = Button(
+            image=ExportCSVButton_image_3,
+            borderwidth=0,
+            highlightthickness=0,
+            command=lambda: print("button_3 clicked"),
+            relief="flat"
+        )
+        ExportCSV_button.place(
+            x=660.0,
+            y=393.0,
+            width=180.0,
+            height=55.0
+        )
+        #------Automation of Visual Inspection-------- maybe team name?
+        canvas.create_text(
+            13.0,
+            13.0,
+            anchor="nw",
+            text="Automation of Visual Inspection",
+            fill="#FCFCFC",
+            font=("Roboto Bold", 24 * -1)
+        )
+        #-------Current Image --------
+        canvas.create_text(
+            39.0,
+            186.0,
+            anchor="nw",
+            text="Current Image:",
+            fill="#000000",
+            font=("Roboto Bold", 24 * -1)
+        )
+
+        CurrentImage_screen = PhotoImage(
+            file=relative_to_assets("image_2.png"))
+
+        CurrentImage_screenCanvas = canvas.create_image(
+            186.0,
+            357.0,
+            image=CurrentImage_screen
+        )
+
+        #-------Image Segmentation-------
+        canvas.create_text(
+            503.0,
+            35.0,
+            anchor="nw",
+            text="Image Segmentation: ",
+            fill="#000000",
+            font=("Roboto Bold", 24 * -1)
+        )
+        ImageSegmenation_screen = PhotoImage(
+            file=relative_to_assets("blackscreen.png"))
+
+        ImageSegmenation_screenCanvas = canvas.create_image(
+            655.0,
+            198.0,
+            image=ImageSegmenation_screen
+        )
+        #-------Quality-------
+        canvas.create_text(
+            503.0,
+            336.0,
+            anchor="nw",
+            text="Quality: ",
+            fill="#000000",
+            font=("Roboto Bold", 24 * -1)
+        )
+        #-------Orientation-----------
+        canvas.create_text(
+            13.0,
+            130.0,
+            anchor="nw",
+            text="Orientation:",
+            fill="#FFFFFF",
+            font=("Roboto Bold", 24 * -1)
+        )
+
+        entry_image_2 = PhotoImage(
+            file=relative_to_assets("entry_2.png"))
+
+        entry_bg_2 = canvas.create_image(
+            256.0,
+            144.0,
+            image=entry_image_2
+        )
+
+        orientation_entry = Entry(
+            bd=0,
+            bg="#F1F5FF",
+            highlightthickness=0
+        )
+
+        orientation_entry.place(
+            x=172.0,
+            y=127.0,
+            width=168.0,
+            height=32.0
+        )
+
+        # -------Part ID-------
+        canvas.create_text(
+            13.0,
+            88.0,
+            anchor="nw",
+            text="PartID:",
+            fill="#FFFFFF",
+            font=("Roboto Bold", 24 * -1)
+        )
+
+        entry_image_1 = PhotoImage(
+            file=relative_to_assets("entry_1.png"))
+
+        entry_bg_1 = canvas.create_image(
+            256.0,
+            102.0,
+            image=entry_image_1
+        )
+
+        partID_entry = Entry(
+            bd=0,
+            bg="#F1F5FF",
+            highlightthickness=0
+        )
+
+        partID_entry.place(
+            x=172.0,
+            y=85.0,
+            width=168.0,
+            height=32.0
+        )
+        #------------------
+        window.resizable(False, False)
+        window.mainloop()
+
+    def takePicture(self):
+        [partid, ori] = self.getPartInfo()
+        im = self.api.takePicture(partid, ori)
+        im = cv.resize(im, (200, 200))
+        photo = ImageTk.PhotoImage(Image.fromarray(im))
+        self.canvas.create_image(100, 100, image=photo)
+        self.canvas.itemconfigure(self.canvas, image=photo)
+        self.classifyPictureLbl.configure(text="")
+
+    def categorize(self):
+        [partid, ori] = self.getPartInfo()
+        res = self.api.classify_img(partid, ori)
+        mp = ['bad', 'good']
+        self.classifyPictureLbl.configure(text=mp[res])
+
+    def export(self):
+        self.api.saveCSV()
+
+    def getPartInfo(self):
+        return [self.partID_entry.get(), self.orientation_entry.get()]
 
 
-canvas = Canvas(
-    window,
-    bg = "#3A7FF6",
-    height = 519,
-    width = 862,
-    bd = 0,
-    highlightthickness = 0,
-    relief = "ridge"
-)
-
-canvas.place(x = 0, y = 0)
-canvas.create_rectangle(
-    431.0,
-    0.0,
-    862.0,
-    519.0,
-    fill="#FCFCFC",
-    outline="")
-#-------------------------------BUTTONS------------------------
-#-------classify-------
-ClassifyButton_image_1 = PhotoImage(
-    file=relative_to_assets("button_1.png"))
-
-Classify_button= Button(
-    image=ClassifyButton_image_1,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_1 clicked"),
-    relief="flat"
-)
-
-Classify_button.place(
-    x=451.0,
-    y=458.0,
-    width=180.0,
-    height=55.0
-)
-#-------Take Picture-------
-TakePictureButton_image_2 = PhotoImage(
-    file=relative_to_assets("button_2.png"))
-
-TakePicture_button = Button(
-    image=TakePictureButton_image_2,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_2 clicked"),
-    relief="flat"
-)
-
-TakePicture_button.place(
-    x=451.0,
-    y=393.0,
-    width=180.0,
-    height=55.0
-)
-#-------Export CSV-------
-ExportCSVButton_image_3 = PhotoImage(
-    file=relative_to_assets("button_3.png"))
-ExportCSV_button = Button(
-    image=ExportCSVButton_image_3,
-    borderwidth=0,
-    highlightthickness=0,
-    command=lambda: print("button_3 clicked"),
-    relief="flat"
-)
-ExportCSV_button.place(
-    x=660.0,
-    y=393.0,
-    width=180.0,
-    height=55.0
-)
-#------Automation of Visual Inspection-------- maybe team name?
-canvas.create_text(
-    13.0,
-    13.0,
-    anchor="nw",
-    text="Automation of Visual Inspection",
-    fill="#FCFCFC",
-    font=("Roboto Bold", 24 * -1)
-)
-#-------Part ID-------
-canvas.create_text(
-    13.0,
-    88.0,
-    anchor="nw",
-    text="PartID:",
-    fill="#FFFFFF",
-    font=("Roboto Bold", 24 * -1)
-)
-
-entry_image_1 = PhotoImage(
-    file=relative_to_assets("entry_1.png"))
-
-entry_bg_1 = canvas.create_image(
-    256.0,
-    102.0,
-    image=entry_image_1
-)
-
-entry_1 = Entry(
-    bd=0,
-    bg="#F1F5FF",
-    highlightthickness=0
-)
-
-entry_1.place(
-    x=172.0,
-    y=85.0,
-    width=168.0,
-    height=32.0
-)
-#-------Current Image --------
-canvas.create_text(
-    39.0,
-    186.0,
-    anchor="nw",
-    text="Current Image:",
-    fill="#000000",
-    font=("Roboto Bold", 24 * -1)
-)
-
-CurrentImage_screen = PhotoImage(
-    file=relative_to_assets("image_2.png"))
-
-CurrentImage_screenCanvas = canvas.create_image(
-    186.0,
-    357.0,
-    image=CurrentImage_screen
-)
-
-#-------Image Segmentation-------
-canvas.create_text(
-    503.0,
-    35.0,
-    anchor="nw",
-    text="Image Segmentation: ",
-    fill="#000000",
-    font=("Roboto Bold", 24 * -1)
-)
-ImageSegmenation_screen = PhotoImage(
-    file=relative_to_assets("blackscreen.png"))
-
-ImageSegmenation_screenCanvas = canvas.create_image(
-    655.0,
-    198.0,
-    image=ImageSegmenation_screen
-)
-#-------Quality-------
-canvas.create_text(
-    503.0,
-    336.0,
-    anchor="nw",
-    text="Quality: ",
-    fill="#000000",
-    font=("Roboto Bold", 24 * -1)
-)
-#-------Orientation-----------
-canvas.create_text(
-    13.0,
-    130.0,
-    anchor="nw",
-    text="Orientation:",
-    fill="#FFFFFF",
-    font=("Roboto Bold", 24 * -1)
-)
-
-entry_image_2 = PhotoImage(
-    file=relative_to_assets("entry_2.png"))
-
-entry_bg_2 = canvas.create_image(
-    256.0,
-    144.0,
-    image=entry_image_2
-)
-
-entry_2 = Entry(
-    bd=0,
-    bg="#F1F5FF",
-    highlightthickness=0
-)
-
-entry_2.place(
-    x=172.0,
-    y=127.0,
-    width=168.0,
-    height=32.0
-)
-#------------------
-
-window.resizable(False, False)
-window.mainloop()
+Display()
