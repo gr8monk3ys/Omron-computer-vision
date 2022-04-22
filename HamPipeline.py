@@ -15,9 +15,10 @@ class Pipeline:
         self.thresholds = {}
         
     def classify(self,imgs:np.array, ori:str):
+        coefs = {"top":0.65,"right":0.65,"left":0.65,"front":0.5,"back":0.65}
         res = list(map(lambda im : self.score(im,ori), np.array(list(map(self._reshp,imgs))) ))
         thresh = self.get_thresh(ori)
-        cls = list(map(lambda r : int(r[0] - 1.5*r[1] < thresh[0] + 1.5*thresh[1]), res))
+        cls = list(map(lambda r : int(r[0] - coefs[ori]*r[1] < thresh[0] + coefs[ori]*thresh[1]), res))
         return cls
     
     def get_ref(self,ori:str):
@@ -36,7 +37,7 @@ class Pipeline:
         if ori in self.thresholds:
             return self.thresholds[ori]
         res = self.get_ref(ori)
-        ans = list(map(lambda im: self.score(im,ori),res[:10]))
+        ans = list(map(lambda im: self.score(im,ori),res[:]))
         mean = np.mean(list(map(lambda r: r[0],ans)))
         std = np.mean(list(map(lambda r: r[1],ans)))
         self.thresholds[ori] = (mean,std)
