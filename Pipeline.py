@@ -14,7 +14,7 @@ class Pipeline:
     def __init__(self):
         # load pipeline
         try:
-            with open('../model.pkl','rb') as file:
+            with open('model.pkl','rb') as file:
                 self._pipe = pickle.load(file)
         except:
             raise NoModelFound
