@@ -12,10 +12,15 @@ class Pipeline:
         self.orb = cv.ORB_create()
         self.bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
         self._reshp = lambda image : cv.resize(image,(250,250))
-        self.thresholds = {}
+        self.thresholds = {
+            'left': (21.535999999999998, 6.9839528964073505),
+            'right': (24.517699999999998, 8.58471387028826),
+            'back': (20.138600000000004, 6.265122946182336),
+            'front': (18.7701, 5.709891458809695)
+        }
         
     def classify(self,imgs:np.array, ori:str):
-        coefs = {"top":0.65,"right":0.65,"left":0.65,"front":0.5,"back":0.65}
+        coefs = {"top":0.65,"right":1.4,"left":0.65,"front":0.5,"back":1.4}
         res = list(map(lambda im : self.score(im,ori), np.array(list(map(self._reshp,imgs))) ))
         thresh = self.get_thresh(ori)
         cls = list(map(lambda r : int(r[0] - coefs[ori]*r[1] < thresh[0] + coefs[ori]*thresh[1]), res))
@@ -37,7 +42,7 @@ class Pipeline:
         if ori in self.thresholds:
             return self.thresholds[ori]
         res = self.get_ref(ori)
-        ans = list(map(lambda im: self.score(im,ori),res[:]))
+        ans = list(map(lambda im: self.score(im,ori),res[:])) # currently uses all reference images for threshold
         mean = np.mean(list(map(lambda r: r[0],ans)))
         std = np.mean(list(map(lambda r: r[1],ans)))
         self.thresholds[ori] = (mean,std)
