@@ -1,6 +1,6 @@
 from History import History
-from Pipeline import Pipeline
-from Camera import Camera # or rpiCamera for picamera
+from HamPipeline import Pipeline
+from Camera import Camera
 
 import numpy as np
 
@@ -19,6 +19,6 @@ class Interface:
         self.hist.saveCSV("history.csv")
 
     def classify_img(self,partid:str,orientation:str):
-        res = self.clf.classify([self.hist.getImage(partid,orientation)])[0]
+        res = self.clf.classify([self.hist.getImage(partid,orientation)],orientation)[0]
         self.hist.classifyPart(partid,orientation,res,np.NaN)
         return res
