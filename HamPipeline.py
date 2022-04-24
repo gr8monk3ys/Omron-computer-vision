@@ -13,17 +13,17 @@ class Pipeline:
         self.bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
         self._reshp = lambda image : cv.resize(image,(250,250))
         self.thresholds = {
-            'left': (21.535999999999998, 6.9839528964073505),
-            'right': (24.517699999999998, 8.58471387028826),
-            'back': (20.138600000000004, 6.265122946182336),
-            'front': (18.7701, 5.709891458809695)
+            'left': (16.82223140495868, 5.347255779597739),
+            'right': (18.00145124716553, 5.211317313204525),
+            'back': (15.945124716553291, 4.71509139790261),
+            'front': (18.788512396694216, 6.047826117346583)
         }
-        
+        self.coefs = {"top":0.65,"right":1.4,"left":0.65,"front":0.9,"back":.4}
     def classify(self,imgs:np.array, ori:str):
-        coefs = {"top":0.65,"right":1.4,"left":0.65,"front":0.5,"back":1.4}
+        
         res = list(map(lambda im : self.score(im,ori), np.array(list(map(self._reshp,imgs))) ))
         thresh = self.get_thresh(ori)
-        cls = list(map(lambda r : int(r[0] - coefs[ori]*r[1] < thresh[0] + coefs[ori]*thresh[1]), res))
+        cls = list(map(lambda r : int(r[0] - self.coefs[ori]*r[1] < thresh[0] + self.coefs[ori]*thresh[1]), res))
         return cls
     
     def get_ref(self,ori:str):
