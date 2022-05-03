@@ -43,6 +43,11 @@ If you'd like to request a new function, feel free to do so by opening an issue 
 - [Raspberry Pi](https://www.raspberrypi.org/) - Hardware used to host the application as well as the connection directly to the camera.
 - [Python](http://getbootstrap.com/) - Language used for all logic pertaining to classification.
 
+## Installation
+
+- Python 3.9.10  
+- tk, matplotlib, Pillow, opencv-python, numpy, pandas  
+`pip install -r requirements.txt`
 
 ## To-do
 - Optimize classification script
