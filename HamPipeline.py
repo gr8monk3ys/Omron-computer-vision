@@ -12,13 +12,8 @@ class Pipeline:
         self.orb = cv.ORB_create()
         self.bf = cv.BFMatcher(cv.NORM_HAMMING, crossCheck=True)
         self._reshp = lambda image : cv.resize(image,(250,250))
-        self.thresholds = {
-            'left': (16.82223140495868, 5.347255779597739),
-            'right': (18.00145124716553, 5.211317313204525),
-            'back': (15.945124716553291, 4.71509139790261),
-            'front': (18.788512396694216, 6.047826117346583)
-        }
-        self.coefs = {"top":0.65,"right":1.4,"left":0.65,"front":0.9,"back":.4}
+        self.thresholds = {}
+        self.coefs = {"top":0.65,"right":1.4,"left":0.65,"front":0.9,"back":.45}
     def classify(self,imgs:np.array, ori:str):
         
         res = list(map(lambda im : self.score(im,ori), np.array(list(map(self._reshp,imgs))) ))
