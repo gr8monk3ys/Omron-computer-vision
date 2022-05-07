@@ -22,12 +22,12 @@ class Pipeline:
         return cls
     
     def get_ref(self,ori:str):
-        if ori not in os.listdir("../dataset/reference/good/"):
+        if ori not in os.listdir("dataset/reference/good/"):
             raise OrientationNotFound()
             
         ref = []
         reshp = lambda image : cv.resize(image,(250,250))
-        for f in glob.iglob("../dataset/reference/good/{}/*".format(ori)):
+        for f in glob.iglob("dataset/reference/good/{}/*".format(ori)):
             im = np.asarray(ImageOps.grayscale(Image.open(f)))
             im = reshp(im)
             ref.append(im)
