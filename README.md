@@ -50,6 +50,4 @@ If you'd like to request a new function, feel free to do so by opening an issue 
 `pip install -r requirements.txt`
 
 ## To-do
-- Optimize classification script
-- Create application GUI
 
